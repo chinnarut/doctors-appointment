@@ -6,12 +6,20 @@ import connectCloudinary from "./configs/cloudinary.js";
 import adminRouter from "./routes/adminRoutes.js";
 import doctorRouter from "./routes/doctorRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import { stripeWebhooks } from "./controllers/userControllers.js";
 
 // app config
 const app = express();
 const PORT = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
+
+// listen to stripe webhooks
+app.post(
+  "/api/stripe",
+  express.raw({ type: "application/json" }),
+  stripeWebhooks
+);
 
 // middlewares
 app.use(express.json()); // When a client sends JSON data (common in APIs), this middleware takes the JSON string from the request body and converts it into a JavaScript object (which is then accessible on req.body)
