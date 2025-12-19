@@ -10,7 +10,7 @@ import { stripeWebhooks } from "./controllers/userControllers.js";
 
 // app config
 const app = express();
-const PORT = process.env.PORt || 4000;
+const PORT = process.env.PORT || 4000;
 connectDB();
 connectCloudinary();
 
