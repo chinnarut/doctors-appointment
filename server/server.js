@@ -11,8 +11,8 @@ import { stripeWebhooks } from "./controllers/userControllers.js";
 // app config
 const app = express();
 const PORT = process.env.PORT || 4000;
-connectDB();
-connectCloudinary();
+await connectDB();
+await connectCloudinary();
 
 // listen to stripe webhooks
 app.post(
