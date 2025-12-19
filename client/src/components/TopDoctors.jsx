@@ -15,7 +15,7 @@ const TopDoctors = () => {
       </p>
       <div className="w-full grid grid-cols-(--grid-cols-auto) gap-4 pt-5 gap-y-6 px-3 sm:px-0">
         {doctors
-          .slice(0, 7)
+          .slice(0, 6)
           .reverse()
           .map((doctor, index) => (
             <div
