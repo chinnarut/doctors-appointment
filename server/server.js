@@ -16,7 +16,7 @@ await connectCloudinary();
 
 // listen to stripe webhooks
 app.post(
-  "/api/stripe",
+  "/api/stripe/webhook",
   express.raw({ type: "application/json" }),
   stripeWebhooks
 );

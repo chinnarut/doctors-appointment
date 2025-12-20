@@ -361,7 +361,6 @@ export const stripePayment = async (req, res) => {
 export const stripeWebhooks = async (req, res) => {
   const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers["stripe-signature"];
-
   let event;
 
   try {
@@ -370,31 +369,29 @@ export const stripeWebhooks = async (req, res) => {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-  } catch (err) {
-    console.error("Webhook signature verification failed.", err.message);
-    return res.status(400).send(`Webhook Error: ${err.message}`);
+  } catch (error) {
+    return res.status(400).send(`Webhook Error : ${error.message}`);
   }
 
-  if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
+  // handle the event
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object;
+    const paymentIntentId = paymentIntent.id;
 
-    const appointmentId = session.metadata?.appointmentId;
+    // getting session metadata
+    const session = await stripeInstance.checkout.sessions.list({
+      payment_intent: paymentIntentId,
+    });
 
-    if (!appointmentId) {
-      console.log("❌ appointmentId missing in session metadata");
-      return res.json({ received: true });
-    }
+    const { appointmentId } = session.data[0].metadata;
 
-    await Appointment.findByIdAndUpdate(
-      appointmentId,
-      { payment: true },
-      { new: true }
-    );
-
-    console.log("✅ Payment marked as paid:", appointmentId);
+    // mark payment as paid
+    await Appointment.findByIdAndUpdate(appointmentId, {
+      payment: true,
+    });
   } else {
-    console.log("Unhandled event type:", event.type);
+    console.log(`Unhandled event type ${event.type}`);
   }
 
-  res.json({ received: true });
+  return res.json({ received: true });
 };
